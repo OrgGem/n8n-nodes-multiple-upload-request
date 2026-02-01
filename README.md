@@ -1,247 +1,276 @@
 ![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
 
-# n8n-nodes-starter
+# n8n Multiple Upload Request Node
 
-This starter repository helps you build custom integrations for [n8n](https://n8n.io). It includes example nodes, credentials, the node linter, and all the tooling you need to get started.
+Một n8n community node chuyên dụng để upload nhiều file nhị phân (binary files) động với khả năng lọc theo pattern và hỗ trợ authentication.
 
-## Quick Start
+**Tiếng Việt** | [English](README_EN.md)
 
-> [!TIP]
-> **New to building n8n nodes?** The fastest way to get started is with `npm create @n8n/node`. This command scaffolds a complete node package for you using the [@n8n/node-cli](https://www.npmjs.com/package/@n8n/node-cli).
+## Tính năng chính
 
-**To create a new node package from scratch:**
+✨ **Upload nhiều file động** - Tự động upload tất cả các file nhị phân từ input hoặc lọc theo pattern
+
+🎯 **Lọc file theo pattern** - Hỗ trợ wildcard patterns (`*`, `?`) để chọn lọc file cần upload
+
+🔐 **Authentication linh hoạt** - Hỗ trợ Bearer Token, Custom Header, hoặc không authentication
+
+🔧 **Tùy chỉnh linh hoạt** - Thêm form fields, query parameters, custom headers
+
+📡 **HTTP Methods** - Hỗ trợ POST, PUT, PATCH requests
+
+⚡ **Xử lý lỗi mạnh mẽ** - Continue on fail, timeout configuration, SSL validation options
+
+## Cài đặt
 
 ```bash
-npm create @n8n/node
+npm install n8n-nodes-multiple-upload-request
 ```
 
-**Already using this starter? Start developing with:**
+## Cách sử dụng
 
-```bash
-npm run dev
+### 1. Thêm node vào workflow
+Tìm kiếm **"Multiple Upload Request"** trong danh sách nodes của n8n.
+
+### 2. Cấu hình cơ bản
+
+**Authentication**: Chọn phương thức xác thực
+- **None**: Không cần xác thực
+- **Bearer Token**: Sử dụng Bearer token (cần credential)
+- **Custom Header**: Sử dụng custom header authentication (cần credential)
+
+**Request Method**: Chọn HTTP method (POST/PUT/PATCH)
+
+**URL**: URL endpoint để upload file
+
+**File Pattern**: Pattern để lọc file (mặc định: `*` - tất cả file)
+- `*` - Upload tất cả file
+- `*.jpg` - Chỉ upload file .jpg
+- `image_*` - Upload file bắt đầu bằng "image_"
+- `file_?.pdf` - Upload file như file_1.pdf, file_a.pdf
+
+**Binary Property Name**: Tên property chứa binary data (mặc định: `data`)
+- Có thể nhập nhiều property, phân cách bằng dấu phẩy: `data, file, attachment`
+
+### 3. Tùy chọn nâng cao
+
+#### Additional Form Fields
+Thêm các field text vào form data cùng với file upload.
+
+#### Query Parameters
+Thêm query parameters vào URL request.
+
+#### Additional Headers
+Thêm custom headers vào request (ví dụ: Content-Type, X-Custom-Header).
+
+#### Timeout
+Cấu hình thời gian timeout cho request (mặc định: 10000ms).
+
+#### Ignore SSL Issues
+Bỏ qua lỗi SSL certificate validation (hữu ích cho môi trường development).
+
+## Ví dụ sử dụng
+
+### Ví dụ 1: Upload tất cả ảnh JPG
+```
+File Pattern: *.jpg
+Binary Property Name: data
 ```
 
-This starts n8n with your nodes loaded and hot reload enabled.
+### Ví dụ 2: Upload nhiều file từ nhiều property
+```
+File Pattern: *
+Binary Property Name: image, document, attachment
+```
 
-## What's Included
+### Ví dụ 3: Upload với Bearer authentication
+```
+Authentication: Bearer Token
+Request Method: POST
+URL: https://api.example.com/upload
+File Pattern: *
+```
 
-This starter repository includes two example nodes to learn from:
+### Ví dụ 4: Upload với form fields bổ sung
+```
+Additional Form Fields:
+  - userId: 12345
+  - category: documents
+  - tags: important,urgent
+```
 
-- **[Example Node](nodes/Example/)** - A simple starter node that shows the basic structure with a custom `execute` method
-- **[GitHub Issues Node](nodes/GithubIssues/)** - A complete, production-ready example built using the **declarative style**:
-  - **Low-code approach** - Define operations declaratively without writing request logic
-  - Multiple resources (Issues, Comments)
-  - Multiple operations (Get, Get All, Create)
-  - Two authentication methods (OAuth2 and Personal Access Token)
-  - List search functionality for dynamic dropdowns
-  - Proper error handling and typing
-  - Ideal for HTTP API-based integrations
+## Pattern Matching
 
-> [!TIP]
-> The declarative/low-code style (used in GitHub Issues) is the recommended approach for building nodes that interact with HTTP APIs. It significantly reduces boilerplate code and handles requests automatically.
+Node hỗ trợ wildcard patterns để lọc file:
 
-Browse these examples to understand both approaches, then modify them or create your own.
+- `*` - Khớp với bất kỳ ký tự nào (0 hoặc nhiều)
+- `?` - Khớp với đúng 1 ký tự
+- Pattern không phân biệt hoa thường
 
-## Finding Inspiration
+**Ví dụ patterns:**
+- `*.pdf` → Tất cả file PDF
+- `report_*.xlsx` → Các file Excel bắt đầu bằng "report_"
+- `image_?.png` → image_1.png, image_a.png, image_x.png
+- `2024-??-*.jpg` → 2024-01-photo.jpg, 2024-12-image.jpg
 
-Looking for more examples? Check out these resources:
+## Credentials
 
-- **[npm Community Nodes](https://www.npmjs.com/search?q=keywords:n8n-community-node-package)** - Browse thousands of community-built nodes on npm using the `n8n-community-node-package` tag
-- **[n8n Built-in Nodes](https://github.com/n8n-io/n8n/tree/master/packages/nodes-base/nodes)** - Study the source code of n8n's official nodes for production-ready patterns and best practices
-- **[n8n Credentials](https://github.com/n8n-io/n8n/tree/master/packages/nodes-base/credentials)** - See how authentication is implemented for various services
+### Bearer Token Authentication
 
-These are excellent resources to understand how to structure your nodes, handle different API patterns, and implement advanced features.
+Để sử dụng Bearer Token authentication:
 
-## Prerequisites
+1. Tạo credential mới loại **Bearer Token Auth**
+2. Nhập Bearer token của bạn
+3. Chọn credential này trong node
 
-Before you begin, install the following on your development machine:
+### Custom Header Authentication
 
-### Required
+Để sử dụng Custom Header authentication:
 
-- **[Node.js](https://nodejs.org/)** (v22 or higher) and npm
-  - Linux/Mac/WSL: Install via [nvm](https://github.com/nvm-sh/nvm)
-  - Windows: Follow [Microsoft's NodeJS guide](https://learn.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows)
+1. Tạo credential mới loại **Custom Header Auth**
+2. Nhập Header Name (ví dụ: `X-API-Key`, `Authorization`)
+3. Nhập Header Value (giá trị của header)
+4. Chọn credential này trong node
+
+## API Response
+
+Node trả về response JSON từ server:
+
+```json
+{
+  "success": true,
+  "message": "Files uploaded successfully",
+  "files": [
+    {
+      "filename": "image1.jpg",
+      "size": 102400,
+      "url": "https://example.com/uploads/image1.jpg"
+    }
+  ]
+}
+```
+
+## Xử lý lỗi
+
+Node hỗ trợ Continue on Fail mode:
+- Khi bật: Lỗi sẽ được trả về dưới dạng JSON và workflow tiếp tục
+- Khi tắt: Lỗi sẽ dừng workflow
+
+## Development
+
+### Yêu cầu
+
+- **[Node.js](https://nodejs.org/)** (v22 trở lên) và npm
 - **[git](https://git-scm.com/downloads)**
 
-### Recommended
-
-- Follow n8n's [development environment setup guide](https://docs.n8n.io/integrations/creating-nodes/build/node-development-environment/)
-
-> [!NOTE]
-> The `@n8n/node-cli` is included as a dev dependency and will be installed automatically when you run `npm install`. The CLI includes n8n for local development, so you don't need to install n8n globally.
-
-## Getting Started with this Starter
-
-Follow these steps to create your own n8n community node package:
-
-### 1. Create Your Repository
-
-[Generate a new repository](https://github.com/n8n-io/n8n-nodes-starter/generate) from this template, then clone it:
+### Clone và cài đặt
 
 ```bash
-git clone https://github.com/<your-organization>/<your-repo-name>.git
-cd <your-repo-name>
-```
-
-### 2. Install Dependencies
-
-```bash
+git clone https://github.com/OrgGem/n8n-nodes-multiple-upload-request.git
+cd n8n-nodes-multiple-upload-request
 npm install
 ```
 
-This installs all required dependencies including the `@n8n/node-cli`.
+### Development mode
 
-### 3. Explore the Examples
-
-Browse the example nodes in [nodes/](nodes/) and [credentials/](credentials/) to understand the structure:
-
-- Start with [nodes/Example/](nodes/Example/) for a basic node
-- Study [nodes/GithubIssues/](nodes/GithubIssues/) for a real-world implementation
-
-### 4. Build Your Node
-
-Edit the example nodes to fit your use case, or create new node files by copying the structure from [nodes/Example/](nodes/Example/).
-
-> [!TIP]
-> If you want to scaffold a completely new node package, use `npm create @n8n/node` to start fresh with the CLI's interactive generator.
-
-### 5. Configure Your Package
-
-Update `package.json` with your details:
-
-- `name` - Your package name (must start with `n8n-nodes-`)
-- `author` - Your name and email
-- `repository` - Your repository URL
-- `description` - What your node does
-
-Make sure your node is registered in the `n8n.nodes` array.
-
-### 6. Develop and Test Locally
-
-Start n8n with your node loaded:
+Chạy n8n với node được load và hot reload enabled:
 
 ```bash
 npm run dev
 ```
 
-This command runs `n8n-node dev` which:
+### Build
 
-- Builds your node with watch mode
-- Starts n8n with your node available
-- Automatically rebuilds when you make changes
-- Opens n8n in your browser (usually http://localhost:5678)
-
-You can now test your node in n8n workflows!
-
-> [!NOTE]
-> Learn more about CLI commands in the [@n8n/node-cli documentation](https://www.npmjs.com/package/@n8n/node-cli).
-
-### 7. Lint Your Code
-
-Check for errors:
-
-```bash
-npm run lint
-```
-
-Auto-fix issues when possible:
-
-```bash
-npm run lint:fix
-```
-
-### 8. Build for Production
-
-When ready to publish:
+Build node cho production:
 
 ```bash
 npm run build
 ```
 
-This compiles your TypeScript code to the `dist/` folder.
-
-### 9. Prepare for Publishing
-
-Before publishing:
-
-1. **Update documentation**: Replace this README with your node's documentation. Use [README_TEMPLATE.md](README_TEMPLATE.md) as a starting point.
-2. **Update the LICENSE**: Add your details to the [LICENSE](LICENSE.md) file.
-3. **Test thoroughly**: Ensure your node works in different scenarios.
-
-### 10. Publish to npm
-
-Publish your package to make it available to the n8n community:
+### Lint và format
 
 ```bash
-npm publish
+npm run lint
+npm run lint:fix
 ```
 
-Learn more about [publishing to npm](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry).
+## Testing
 
-### 11. Submit for Verification (Optional)
+Xem [TESTING_GUIDE.md](TESTING_GUIDE.md) để biết chi tiết về các test scenarios và cách validate node.
 
-Get your node verified for n8n Cloud:
+## Use Cases
 
-1. Ensure your node meets the [requirements](https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes/):
-   - Uses MIT license ✅ (included in this starter)
-   - No external package dependencies
-   - Follows n8n's design guidelines
-   - Passes quality and security review
+### 1. Upload ảnh từ form submission
+Workflow nhận nhiều ảnh từ webhook form submission và upload lên cloud storage.
 
-2. Submit through the [n8n Creator Portal](https://creators.n8n.io/nodes)
+### 2. Batch upload documents
+Upload hàng loạt documents từ một folder vào document management system.
 
-**Benefits of verification:**
+### 3. Backup files
+Định kỳ backup các file quan trọng lên remote storage với authentication.
 
-- Available directly in n8n Cloud
-- Discoverable in the n8n nodes panel
-- Verified badge for quality assurance
-- Increased visibility in the n8n community
+### 4. Image processing pipeline
+Upload ảnh đã xử lý (resize, watermark) lên CDN.
 
-## Available Scripts
+### 5. Multi-tenant file upload
+Upload file của nhiều users khác nhau với dynamic authentication headers.
 
-This starter includes several npm scripts to streamline development:
+## Công nghệ sử dụng
 
-| Script                | Description                                                      |
-| --------------------- | ---------------------------------------------------------------- |
-| `npm run dev`         | Start n8n with your node and watch for changes (runs `n8n-node dev`) |
-| `npm run build`       | Compile TypeScript to JavaScript for production (runs `n8n-node build`) |
-| `npm run build:watch` | Build in watch mode (auto-rebuild on changes)                    |
-| `npm run lint`        | Check your code for errors and style issues (runs `n8n-node lint`) |
-| `npm run lint:fix`    | Automatically fix linting issues when possible (runs `n8n-node lint --fix`) |
-| `npm run release`     | Create a new release (runs `n8n-node release`)                   |
+- **TypeScript** - Type-safe development
+- **n8n-workflow** - n8n SDK và types
+- **Node.js** - Runtime environment
+- **Multipart form-data** - File upload handling
 
-> [!TIP]
-> These scripts use the [@n8n/node-cli](https://www.npmjs.com/package/@n8n/node-cli) under the hood. You can also run CLI commands directly, e.g., `npx n8n-node dev`.
+## Cấu trúc thư mục
 
-## Troubleshooting
+```
+nodes/MultipleUploadRequest/
+├── MultipleUploadRequest.node.ts  # Main node implementation
+├── MultipleUploadRequest.node.json # Node metadata
+├── description.ts                  # UI property definitions
+├── utils.ts                        # Wildcard pattern matching
+├── upload.svg                      # Light mode icon
+└── upload.dark.svg                 # Dark mode icon
 
-### My node doesn't appear in n8n
-
-1. Make sure you ran `npm install` to install dependencies
-2. Check that your node is listed in `package.json` under `n8n.nodes`
-3. Restart the dev server with `npm run dev`
-4. Check the console for any error messages
-
-### Linting errors
-
-Run `npm run lint:fix` to automatically fix most common issues. For remaining errors, check the [n8n node development guidelines](https://docs.n8n.io/integrations/creating-nodes/).
-
-### TypeScript errors
-
-Make sure you're using Node.js v22 or higher and have run `npm install` to get all type definitions.
-
-## Resources
-
-- **[n8n Node Documentation](https://docs.n8n.io/integrations/creating-nodes/)** - Complete guide to building nodes
-- **[n8n Community Forum](https://community.n8n.io/)** - Get help and share your nodes
-- **[@n8n/node-cli Documentation](https://www.npmjs.com/package/@n8n/node-cli)** - CLI tool reference
-- **[n8n Creator Portal](https://creators.n8n.io/nodes)** - Submit your node for verification
-- **[Submit Community Nodes Guide](https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes/)** - Verification requirements and process
+credentials/
+├── BearerTokenAuthApi.credentials.ts      # Bearer token auth
+└── CustomHeaderAuthApi.credentials.ts     # Custom header auth
+```
 
 ## Contributing
 
-Have suggestions for improving this starter? [Open an issue](https://github.com/n8n-io/n8n-nodes-starter/issues) or submit a pull request!
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## License
 
-[MIT](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md)
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+## Support
+
+- **Documentation**: [n8n docs](https://docs.n8n.io/)
+- **Community**: [n8n community forum](https://community.n8n.io/)
+- **Issues**: [GitHub Issues](https://github.com/OrgGem/n8n-nodes-multiple-upload-request/issues)
+
+## Changelog
+
+Xem [CHANGELOG.md](CHANGELOG.md) để biết lịch sử thay đổi.
+
+## Author
+
+**n8n Community**
+- Email: community@n8n.io
+
+## Acknowledgments
+
+- n8n team for the excellent workflow automation platform
+- n8n community for inspiration and support
+
+---
+
+Made with ❤️ for the n8n community
