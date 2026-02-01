@@ -179,9 +179,21 @@ export class MultipleUploadRequest implements INodeType {
 
 				// Execute the request
 				const authentication = this.getNodeParameter('authentication', itemIndex) as string;
-				let response;
+				let response: IDataObject;
 				
 				if (authentication === 'none') {
+					response = await this.helpers.httpRequest(requestOptions);
+				} else if (authentication === 'customHeader') {
+					// Handle custom header authentication manually
+					const credentials = await this.getCredentials('customHeaderAuthApi');
+					const headerName = credentials.headerName as string;
+					const headerValue = credentials.headerValue as string;
+					
+					if (!requestOptions.headers) {
+						requestOptions.headers = {};
+					}
+					requestOptions.headers[headerName] = headerValue;
+					
 					response = await this.helpers.httpRequest(requestOptions);
 				} else {
 					response = await this.helpers.httpRequestWithAuthentication.call(

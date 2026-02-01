@@ -1,5 +1,4 @@
 import type {
-	IAuthenticateGeneric,
 	ICredentialTestRequest,
 	ICredentialType,
 	INodeProperties,
@@ -16,7 +15,7 @@ export class CustomHeaderAuthApi implements ICredentialType {
 			displayName: 'Header Name',
 			name: 'headerName',
 			type: 'string',
-			default: '',
+			default: 'X-API-Key',
 			required: true,
 			description: 'The name of the custom header (e.g., X-API-Key)',
 		},
@@ -30,15 +29,6 @@ export class CustomHeaderAuthApi implements ICredentialType {
 			description: 'The value of the custom header',
 		},
 	];
-
-	authenticate: IAuthenticateGeneric = {
-		type: 'generic',
-		properties: {
-			headers: {
-				'={{$credentials.headerName}}': '={{$credentials.headerValue}}',
-			},
-		},
-	};
 
 	test: ICredentialTestRequest = {
 		request: {
