@@ -1,0 +1,6 @@
+{
+	"name": "multipleUploadRequest",
+	"displayName": "Multiple Upload Request",
+	"icon": "file:upload.svg",
+	"description": "Upload multiple binary files with pattern filtering and authentication support"
+}
