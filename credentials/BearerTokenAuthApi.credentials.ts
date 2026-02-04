@@ -1,10 +1,4 @@
-import type {
-	IAuthenticateGeneric,
-	ICredentialTestRequest,
-	ICredentialType,
-	INodeProperties,
-	Icon,
-} from 'n8n-workflow';
+import type { IAuthenticateGeneric, ICredentialType, INodeProperties, Icon } from 'n8n-workflow';
 
 export class BearerTokenAuthApi implements ICredentialType {
 	name = 'bearerTokenAuthApi';
@@ -29,13 +23,6 @@ export class BearerTokenAuthApi implements ICredentialType {
 			headers: {
 				Authorization: '=Bearer {{$credentials.token}}',
 			},
-		},
-	};
-
-	test: ICredentialTestRequest = {
-		request: {
-			baseURL: '={{$credentials?.testUrl}}',
-			url: '',
 		},
 	};
 }

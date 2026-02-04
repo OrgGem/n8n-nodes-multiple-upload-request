@@ -57,6 +57,8 @@ export class MultipleUploadRequest implements INodeType {
 			try {
 				const requestMethod = this.getNodeParameter('requestMethod', itemIndex) as string;
 				const url = this.getNodeParameter('url', itemIndex) as string;
+				const sendMethod = this.getNodeParameter('sendMethod', itemIndex, 'multipart') as string;
+				const fileFieldName = this.getNodeParameter('fileFieldName', itemIndex, 'files') as string;
 				const filePattern = this.getNodeParameter('filePattern', itemIndex, '*') as string;
 				const binaryPropertyName = this.getNodeParameter(
 					'binaryPropertyName',
@@ -106,40 +108,84 @@ export class MultipleUploadRequest implements INodeType {
 					);
 				}
 
-				// Prepare form data
-				const formData: IDataObject = {};
+				// Prepare request options based on send method
+				let requestOptions: IHttpRequestOptions;
 
-				// Add filtered binary files
-				for (const [key, binaryData] of Object.entries(filteredFiles)) {
-					const buffer = await this.helpers.getBinaryDataBuffer(itemIndex, key);
-					formData[key] = {
-						value: buffer,
-						options: {
+				if (sendMethod === 'base64') {
+					// Base64 JSON mode - send files as array of base64 objects
+					const base64Files: Array<{ filename: string; mimeType: string; data: string }> = [];
+
+					for (const [key, binaryData] of Object.entries(filteredFiles)) {
+						const buffer = await this.helpers.getBinaryDataBuffer(itemIndex, key);
+						base64Files.push({
 							filename: binaryData.fileName || key,
-							contentType: binaryData.mimeType || 'application/octet-stream',
-						},
-					};
-				}
+							mimeType: binaryData.mimeType || 'application/octet-stream',
+							data: buffer.toString('base64'),
+						});
+					}
 
-				// Add additional form fields
-				if (options.formFields) {
-					const formFields = (options.formFields as IDataObject).field as IDataObject[];
-					if (formFields && Array.isArray(formFields)) {
-						for (const field of formFields) {
-							if (field.name) {
-								formData[field.name as string] = field.value;
+					// Build JSON body
+					const jsonBody: IDataObject = {
+						[fileFieldName]: base64Files,
+					};
+
+					// Add additional form fields to JSON body
+					if (options.formFields) {
+						const formFields = (options.formFields as IDataObject).field as IDataObject[];
+						if (formFields && Array.isArray(formFields)) {
+							for (const field of formFields) {
+								if (field.name) {
+									jsonBody[field.name as string] = field.value;
+								}
 							}
 						}
 					}
-				}
 
-				// Prepare request options
-				const requestOptions: IHttpRequestOptions = {
-					method: requestMethod as IHttpRequestMethods,
-					url,
-					body: formData,
-					headers: {},
-				};
+					requestOptions = {
+						method: requestMethod as IHttpRequestMethods,
+						url,
+						body: jsonBody,
+						headers: {
+							'Content-Type': 'application/json',
+						},
+					};
+				} else {
+					// Multipart form data mode (default)
+					const formData: IDataObject = {};
+
+					// Add filtered binary files
+					for (const [key, binaryData] of Object.entries(filteredFiles)) {
+						const buffer = await this.helpers.getBinaryDataBuffer(itemIndex, key);
+						formData[key] = {
+							value: buffer,
+							options: {
+								filename: binaryData.fileName || key,
+								contentType: binaryData.mimeType || 'application/octet-stream',
+							},
+						};
+					}
+
+					// Add additional form fields
+					if (options.formFields) {
+						const formFields = (options.formFields as IDataObject).field as IDataObject[];
+						if (formFields && Array.isArray(formFields)) {
+							for (const field of formFields) {
+								if (field.name) {
+									formData[field.name as string] = field.value;
+								}
+							}
+						}
+					}
+
+					requestOptions = {
+						method: requestMethod as IHttpRequestMethods,
+						url,
+						body: formData,
+						headers: {
+							'Content-Type': 'multipart/form-data',
+						},
+					};
+				}
 
 				// Add query parameters
 				if (options.queryParameters) {

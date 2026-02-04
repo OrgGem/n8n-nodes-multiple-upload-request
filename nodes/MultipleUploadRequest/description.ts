@@ -53,6 +53,38 @@ export const multipleUploadRequestDescription: INodeProperties[] = [
 		description: 'The URL to send the request to',
 	},
 	{
+		displayName: 'Send Method',
+		name: 'sendMethod',
+		type: 'options',
+		options: [
+			{
+				name: 'Multipart Form Data',
+				value: 'multipart',
+				description: 'Send files as multipart/form-data (standard file upload)',
+			},
+			{
+				name: 'Base64 JSON',
+				value: 'base64',
+				description: 'Send files as base64-encoded strings in JSON body',
+			},
+		],
+		default: 'multipart',
+		description: 'How to send the files to the endpoint',
+	},
+	{
+		displayName: 'File Field Name',
+		name: 'fileFieldName',
+		type: 'string',
+		default: 'files',
+		placeholder: 'files',
+		description: 'The field name for files in the request. For multipart: each file uses this as prefix. For base64: the JSON array key.',
+		displayOptions: {
+			show: {
+				sendMethod: ['base64'],
+			},
+		},
+	},
+	{
 		displayName: 'File Pattern',
 		name: 'filePattern',
 		type: 'string',

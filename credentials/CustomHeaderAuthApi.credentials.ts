@@ -1,5 +1,4 @@
 import type {
-	ICredentialTestRequest,
 	ICredentialType,
 	INodeProperties,
 	Icon,
@@ -29,11 +28,4 @@ export class CustomHeaderAuthApi implements ICredentialType {
 			description: 'The value of the custom header',
 		},
 	];
-
-	test: ICredentialTestRequest = {
-		request: {
-			baseURL: '={{$credentials?.testUrl}}',
-			url: '',
-		},
-	};
 }

@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-multiple-upload-request",
-	"version": "0.1.1",
+	"version": "0.2.0",
 	"description": "n8n node for uploading multiple binary files dynamically with pattern filtering",
 	"license": "MIT",
 	"homepage": "",
