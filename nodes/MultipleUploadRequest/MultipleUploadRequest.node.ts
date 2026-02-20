@@ -180,11 +180,12 @@ export class MultipleUploadRequest implements INodeType {
 					requestOptions = {
 						method: requestMethod as IHttpRequestMethods,
 						url,
-						body: formData,
-						headers: {
-							'Content-Type': 'multipart/form-data',
-						},
+						// Do not set Content-Type header manually for multipart/form-data
+						// The request library will add it with the correct boundary
+						headers: {},
 					};
+					// Use formData property for multipart requests
+					Object.assign(requestOptions, { formData });
 				}
 
 				// Add query parameters
