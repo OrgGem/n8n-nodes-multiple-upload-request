@@ -28,7 +28,8 @@ export function filterBinaryFiles(
 
 	const filtered: Record<string, IBinaryData> = {};
 	for (const [key, value] of Object.entries(binaryFiles)) {
-		if (wildcardMatch(key, pattern)) {
+		const filename = value.fileName || key;
+		if (wildcardMatch(filename, pattern)) {
 			filtered[key] = value;
 		}
 	}

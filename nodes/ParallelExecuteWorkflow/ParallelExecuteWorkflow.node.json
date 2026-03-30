@@ -1,0 +1,18 @@
+{
+	"node": "n8n-nodes-multiple-upload-request.parallelExecuteWorkflow",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"details": "The Parallel Execute Workflow node allows you to execute a sub-workflow in parallel for each input item, similar to Promise.all in JavaScript. This dramatically improves performance compared to sequential execution. Supports concurrency limits and configurable error handling strategies.",
+	"categories": ["Core Nodes"],
+	"resources": {
+		"primaryDocumentation": [
+			{
+				"url": "https://github.com/OrgGem/n8n-nodes-multiple-upload-request"
+			}
+		]
+	},
+	"alias": ["parallel", "concurrent", "promise.all", "sub", "workflow", "sub-workflow", "subworkflow", "batch", "fan-out"],
+	"subcategories": {
+		"Core Nodes": ["Helpers", "Flow"]
+	}
+}

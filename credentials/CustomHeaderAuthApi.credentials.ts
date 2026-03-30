@@ -1,4 +1,5 @@
 import type {
+	IAuthenticateGeneric,
 	ICredentialType,
 	INodeProperties,
 	Icon,
@@ -28,4 +29,13 @@ export class CustomHeaderAuthApi implements ICredentialType {
 			description: 'The value of the custom header',
 		},
 	];
+
+	authenticate: IAuthenticateGeneric = {
+		type: 'generic',
+		properties: {
+			headers: {
+				'={{$credentials.headerName}}': '={{$credentials.headerValue}}',
+			},
+		},
+	};
 }
